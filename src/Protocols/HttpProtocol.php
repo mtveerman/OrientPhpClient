@@ -2,7 +2,9 @@
 
 namespace mtveerman\OrientPhpClient\Protocols;
 
-class HttpProtocol
+use mtveerman\OrientPhpClient\Protocol;
+
+class HttpProtocol extends Protocol
 {
     public function connect()
     {

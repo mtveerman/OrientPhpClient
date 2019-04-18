@@ -6,18 +6,19 @@ namespace mtveerman\OrientPhpClient;
 
 use mtveerman\OrientPhpClient\Client;
 use mtveerman\OrientPhpClient\Config;
+use mtveerman\OrientPhpClient\Protocols\HttpProtocol;
 
 class ClientTest extends \PHPUnit\Framework\TestCase
 {
     public function testClient()
     {
-        $client = new Client();
+        $client = new Client(new HttpProtocol());
         $this->assertInstanceOf(Client::class, $client);
     }
 
     public function testConfig()
     {
-        $client = new Client(new Config());
+        $client = new Client(new HttpProtocol(), new Config());
         $this->assertNull($client->config()->name);
         $this->assertEquals("localhost", $client->config->server);
 

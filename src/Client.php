@@ -8,13 +8,12 @@ class Client
 {
     protected $config;
 
-    const HTTP_PROTOCOL = 1;
-    const BINARY_PROTOCOL = 2;
+    protected $protocol;
 
-    protected $protocol = self::HTTP_PROTOCOL;
-
-    public function __construct(Config $config = null)
+    public function __construct(Protocol $protocol, Config $config = null)
     {
+        $this->setProtocol($protocol);
+        
         if ($config) {
             $this->setConfig($config);
         }
@@ -25,20 +24,9 @@ class Client
         $this->config = $config;
     }
 
-    public function setProtocolType($type)
+    public function setProtocol(Protocol $protocol)
     {
-        if ($type == $this.HTTP_PROTOCOL) {
-            $this->protocol = $type;
-        } elseif ($type == $this.BINARYPROTOCOL) {
-            throw new WrongProtocolException("Binary protocol not supported");
-        } else {
-            throw new WrongProtocolException("Wrong protocol");
-        }
-    }
-
-    public function getProtocolType()
-    {
-        return $this->protocol;
+        $this->protocol = $protocol;
     }
 
     public function __get(string $name)
