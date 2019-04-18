@@ -8,7 +8,7 @@ use mtveerman\OrientPhpClient\Client;
 use mtveerman\OrientPhpClient\Config;
 use mtveerman\OrientPhpClient\Protocols\HttpProtocol;
 
-class ClientTest extends \PHPUnit\Framework\TestCase
+class ClientTest extends BaseTest
 {
     public function testClient()
     {
