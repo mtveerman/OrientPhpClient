@@ -24,6 +24,12 @@ class HttpProtocolTest extends BaseTest
         $this->config->database = getenv("DB_DATABASE");
     }
 
+    public function tearDown():void
+    {
+        $client = new Client(new HttpProtocol(), $this->config);
+        $result = $client->command("DELETE VERTEX V");
+    }
+
     public function testHttpProtocol()
     {
         $proto = new HttpProtocol();
@@ -42,7 +48,17 @@ class HttpProtocolTest extends BaseTest
         $client = new Client(new HttpProtocol(), $this->config);
         $result = $client->query("SELECT @rid FROM V");
 
+        $this->assertEquals(0, count($result));
+
+        // Now add something
+        $result = $client->command("CREATE VERTEX V SET name='maarten'");
+
         $this->assertGreaterThan(0, count($result));
+
+        // Run query again
+        $result = $client->query("SELECT @rid FROM V");
+
+        $this->assertEquals(1, count($result));
 
         $this->assertNotEmpty($result[0]->{'@rid'});
     }
@@ -50,11 +66,46 @@ class HttpProtocolTest extends BaseTest
     public function testCommand()
     {
         $client = new Client(new HttpProtocol(), $this->config);
+
+        // Now add something
+        $result = $client->command("CREATE VERTEX V SET name='maarten'");
+
         $result = $client->command("SELECT @rid FROM V");
 
         $this->assertGreaterThan(0, count($result));
 
         $this->assertNotEmpty($result[0]->{'@rid'});
+    }
+
+    public function testCommandWithParameters()
+    {
+        $client = new Client(new HttpProtocol(), $this->config);
+
+        // Now add something
+        $result = $client->command("CREATE VERTEX V SET name=?", ['maarten veerman']);
+
+        $result = $client->command("SELECT @rid, name FROM V");
+
+        $this->assertGreaterThan(0, count($result));
+
+        $this->assertNotEmpty($result[0]->{'@rid'});
+        $this->assertEquals("maarten veerman", $result[0]->name);
+    }
+
+    public function testCommandWithNamedParameters()
+    {
+        $client = new Client(new HttpProtocol(), $this->config);
+
+        // Now add something
+        $result = $client->command("CREATE VERTEX V SET name=:name, email=:email", ['email'=>'test@example.com', 'name'=>'maarten veerman']);
+
+        $result = $client->command("SELECT @rid, name, email FROM V");
+
+        $this->assertGreaterThan(0, count($result));
+
+        $this->assertNotEmpty($result[0]->{'@rid'});
+        $this->assertEquals("maarten veerman", $result[0]->name);
+        $this->assertEquals("test@example.com", $result[0]->email);
     }
 
     public function testServer()
