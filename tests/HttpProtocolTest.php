@@ -108,6 +108,44 @@ class HttpProtocolTest extends BaseTest
         $this->assertEquals("test@example.com", $result[0]->email);
     }
 
+    public function testBatch()
+    {
+        $client = new Client(new HttpProtocol(), $this->config);
+
+        // Now add something
+        $objects = [
+          [
+            'name'=>"test1",
+            'email'=>"test1@example.com"
+          ],
+          [
+            'name'=>"test2",
+            'email'=>"test2@example.com"
+          ]
+        ];
+
+        $sql = "BEGIN;\n";
+        $parameters = [];
+        foreach ($objects as $key => $value) {
+            $name = "name" . $key;
+            $email = "email" . $key;
+            $sql .= sprintf("CREATE VERTEX V SET name=?, email=?;\n");
+            $parameters[] = $value['name'];
+            $parameters[] = $value['email'];
+        }
+        $sql .= "COMMIT;";
+
+        $result = $client->batch($sql, $parameters);
+
+        $result = $client->query("SELECT @rid, name, email FROM V ORDER BY name");
+
+        $this->assertCount(2, $result);
+
+        $this->assertNotEmpty($result[0]->{'@rid'});
+        $this->assertEquals("test1", $result[0]->name);
+        $this->assertEquals("test1@example.com", $result[0]->email);
+    }
+
     public function testServer()
     {
         $client = new Client(new HttpProtocol(), $this->config);

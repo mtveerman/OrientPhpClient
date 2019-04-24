@@ -114,6 +114,44 @@ class HttpProtocol extends Protocol
         return false;
     }
 
+    public function batch($command, $parameters = [], $language = "sql", $transaction = false)
+    {
+        $this->connect();
+
+        //http://<server>:[<port>]/batch/<database>
+        $server = $this->client->config->server;
+        $port = $this->client->config->port;
+        $database = $this->client->config->database;
+
+        $url = sprintf('http://%s:%d/batch/%s', $server, $port, $database);
+
+        $body = new \stdClass;
+        $body->transaction = $transaction;
+        $body->operations = [];
+
+        // Add a single operation
+        $op = new \stdClass;
+        $op->type = "script";
+        $op->language = $language;
+        $op->script = $command;
+        if (count($parameters) > 0) {
+            $op->parameters = $parameters;
+        }
+
+        array_push($body->operations, $op);
+
+        $body = json_encode($body);
+
+        $result = $this->httpclient->request('POST', $url, ['body'=>$body]);
+
+        if ($result->getStatusCode() == 200) {
+            return json_decode($result->getBody()->getContents());
+        }
+
+        return false;
+    }
+
+
     public function server()
     {
         $this->connect();
