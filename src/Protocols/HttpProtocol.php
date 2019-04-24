@@ -120,11 +120,18 @@ class HttpProtocol extends Protocol
 
         $server = $this->client->config->server;
         $port = $this->client->config->port;
+        $username = $this->client->config->username;
+        $password = $this->client->config->password;
 
         $url = sprintf('http://%s:%d/server', $server, $port);
 
-        $result = $this->httpclient->request('GET', $url);
+        $result = $this->httpclient->request('GET', $url, ['auth' => [$username, $password]]);
 
-        return true;
+        if ($result->getStatusCode() == 200) {
+            $json = json_decode($result->getBody()->getContents());
+            return $json;
+        }
+
+        return false;
     }
 }

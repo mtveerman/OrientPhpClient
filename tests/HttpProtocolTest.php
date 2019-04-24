@@ -61,7 +61,7 @@ class HttpProtocolTest extends BaseTest
     {
         $client = new Client(new HttpProtocol(), $this->config);
         $result = $client->server();
-        var_dump($result);
-        $this->assertTrue($result);
+
+        $this->assertGreaterThan(0, $result->storages);
     }
 }
