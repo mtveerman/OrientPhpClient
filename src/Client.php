@@ -13,7 +13,7 @@ class Client
     public function __construct(Protocol $protocol, Config $config = null)
     {
         $this->setProtocol($protocol);
-        
+
         if ($config) {
             $this->setConfig($config);
         }
@@ -27,6 +27,7 @@ class Client
     public function setProtocol(Protocol $protocol)
     {
         $this->protocol = $protocol;
+        $protocol->setClient($this);
     }
 
     public function __get(string $name)
@@ -41,5 +42,8 @@ class Client
         if (isset($this->{$name})) {
             return $this->{$name};
         }
+
+        // Else we give the call to the protocol
+        return $this->protocol->{$name}(...$arguments);
     }
 }

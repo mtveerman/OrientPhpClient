@@ -20,8 +20,6 @@ class Config
 
     public function __set(string $name, $value)
     {
-        if (isset($this->{$name})) {
-            $this->{$name} = $value;
-        }
+        $this->{$name} = $value;
     }
 }
