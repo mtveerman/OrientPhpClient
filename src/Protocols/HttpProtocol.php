@@ -78,6 +78,8 @@ class HttpProtocol extends Protocol
         $port = $this->client->config->port;
         $database = $this->client->config->database;
 
+        $query = urlencode($query);
+
         $url = sprintf('http://%s:%d/query/%s/%s/%s', $server, $port, $database, $language, $query);
 
         $result = $this->httpclient->request('GET', $url);
