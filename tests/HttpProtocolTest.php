@@ -146,6 +146,20 @@ class HttpProtocolTest extends BaseTest
         $this->assertEquals("test1@example.com", $result[0]->email);
     }
 
+    public function testCount()
+    {
+        $client = new Client(new HttpProtocol(), $this->config);
+
+        // Now add something
+        for ($i=0;$i<25;$i++) {
+            $result = $client->command("CREATE VERTEX V SET id=:id", ['id'=>$i]);
+        }
+
+        // Now run the count check
+        $result = $client->query("SELECT count(*) as count FROM V");
+        $this->assertEquals(25, $result[0]->count);
+    }
+
     public function testServer()
     {
         $client = new Client(new HttpProtocol(), $this->config);
