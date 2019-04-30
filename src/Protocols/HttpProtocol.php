@@ -15,8 +15,6 @@ class HttpProtocol extends Protocol
 
     protected $httpclient;
 
-    protected $timeout = 2;
-
     protected $cookieJar;
 
     protected $OSessionID;
@@ -33,7 +31,6 @@ class HttpProtocol extends Protocol
         if (!$this->httpclient) {
             $this->cookieJar = new CookieJar();
             $this->httpclient = new HttpClient([
-              'timeout'  => $this->timeout,
               'cookies'  => $this->cookieJar,
               'headers'  => [
                 'Accept-Encoding' => 'gzip,deflate',
@@ -55,10 +52,11 @@ class HttpProtocol extends Protocol
         $database = $this->client->config->database;
         $username = $this->client->config->username;
         $password = $this->client->config->password;
+        $timeout = $this->client->config->timeout;
 
         $url = sprintf('http://%s:%d/connect/%s', $server, $port, $database);
 
-        $result = $this->httpclient->request('GET', $url, ['auth' => [$username, $password]]);
+        $result = $this->httpclient->request('GET', $url, ['timeout'=>$timeout, 'auth' => [$username, $password]]);
 
         if ($result->getStatusCode() == 204) {
             $this->connected = true;
@@ -77,12 +75,13 @@ class HttpProtocol extends Protocol
         $server = $this->client->config->server;
         $port = $this->client->config->port;
         $database = $this->client->config->database;
+        $timeout = $this->client->config->timeout;
 
         $query = urlencode($query);
 
         $url = sprintf('http://%s:%d/query/%s/%s/%s', $server, $port, $database, $language, $query);
 
-        $result = $this->httpclient->request('GET', $url);
+        $result = $this->httpclient->request('GET', $url, ['timeout'=>$timeout, ]);
 
         if ($result->getStatusCode() == 200) {
             return $this->decodeResponse($result);
@@ -99,6 +98,7 @@ class HttpProtocol extends Protocol
         $server = $this->client->config->server;
         $port = $this->client->config->port;
         $database = $this->client->config->database;
+        $timeout = $this->client->config->timeout;
 
         $url = sprintf('http://%s:%d/command/%s/%s//20', $server, $port, $database, $language);
 
@@ -107,7 +107,7 @@ class HttpProtocol extends Protocol
         $body->parameters = $parameters;
         $body = json_encode($body);
 
-        $result = $this->httpclient->request('POST', $url, ['body'=>$body]);
+        $result = $this->httpclient->request('POST', $url, ['timeout'=>$timeout, 'body'=>$body]);
 
         if ($result->getStatusCode() == 200) {
             return $this->decodeResponse($result);
@@ -124,6 +124,7 @@ class HttpProtocol extends Protocol
         $server = $this->client->config->server;
         $port = $this->client->config->port;
         $database = $this->client->config->database;
+        $timeout = $this->client->config->timeout;
 
         $url = sprintf('http://%s:%d/batch/%s', $server, $port, $database);
 
@@ -144,7 +145,7 @@ class HttpProtocol extends Protocol
 
         $body = json_encode($body);
 
-        $result = $this->httpclient->request('POST', $url, ['body'=>$body]);
+        $result = $this->httpclient->request('POST', $url, ['timeout'=>$timeout, 'body'=>$body]);
 
         if ($result->getStatusCode() == 200) {
             return json_decode($result->getBody()->getContents());
@@ -162,10 +163,11 @@ class HttpProtocol extends Protocol
         $port = $this->client->config->port;
         $username = $this->client->config->username;
         $password = $this->client->config->password;
+        $timeout = $this->client->config->timeout;
 
         $url = sprintf('http://%s:%d/server', $server, $port);
 
-        $result = $this->httpclient->request('GET', $url, ['auth' => [$username, $password]]);
+        $result = $this->httpclient->request('GET', $url, ['timeout'=>$timeout, 'auth' => [$username, $password]]);
 
         if ($result->getStatusCode() == 200) {
             $json = json_decode($result->getBody()->getContents());
