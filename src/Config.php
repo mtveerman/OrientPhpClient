@@ -9,6 +9,7 @@ class Config
     private $database;
     private $username;
     private $password;
+    private $timeout = 10;
 
     public function __get(string $name)
     {
